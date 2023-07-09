@@ -1,0 +1,11 @@
+__pycache__
+.vscode
+venv
+wc-LOC.png
+wc-ORG.png
+wc-PER.png
+*/doccano_credentials.py
+*/*migrations
+.env
+pyproject.toml
+logs.log

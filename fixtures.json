@@ -1,0 +1,23 @@
+[
+  {
+    "model": "newsfeedner.UserRoles",
+    "pk": 1,
+    "fields": {
+      "role": "annotator"
+    }
+  },
+  {
+    "model": "newsfeedner.UserRoles",
+    "pk": 2,
+    "fields": {
+      "role": "annotation approver"
+    }
+  },
+  {
+    "model": "newsfeedner.UserRoles",
+    "pk": 3,
+    "fields": {
+      "role": "admin"
+    }
+  }
+]

@@ -1,0 +1,162 @@
+{% extends 'newsfeedner/base.html' %}
+{% load bootstrap_pagination %}
+
+{% block main %}
+<div class="container py-3">
+
+    <div class="row mb-2 justify-content-center text-muted">
+        Последнее обновление в {{ last_fetched_at }}
+    </div>
+
+    <form action="/static?" method="get">
+        <!-- {{ form }} -->
+
+        Регион:
+        <select id="region" name="region" style="width: 120px" onchange="this.form.submit()">
+            <option value="">Все регионы</option>
+            {% for obj in regions %}
+            <option value="{{ obj.0 }}" >{{ obj.1 }}</option>
+            {% endfor %}
+        </select>
+        Тип отношений:
+        <select id="relation" name="relation" style="width: 120px">
+            <option value="">Все типы</option>
+            {% for obj in relations %}
+            <option value="{{ obj.0}}">{{ obj.1 }}</option>
+                <!--<option value="{{ obj.1.0 }}" data-chained="{{ obj.0 }}">{{ obj.1.1 }}</option> -->
+
+            {% endfor %}
+        </select>
+        Страна:
+        <select id="country" name="country" style="width: 120px">
+            <option value="">Все страны</option>
+            {% for obj in countries %}
+            <option value="{{ obj.1.0 }}" data-chained="{{ obj.0 }}">{{ obj.1.1 }}</option>
+            {% endfor %}
+        </select>
+        Товарный раздел:
+        <select id="product_branch" name="product_branch" style="width: 120px">
+            <option value="">Все товарные разделы</option>
+            {% for obj in product_branches %}
+            <option value="{{ obj.1.0 }}" data-chained="{{ obj.0 }}">{{ obj.1.1 }}</option>
+            {% endfor %}
+        </select>
+        Товарная группа:
+        <select id="product" name="product" style="width: 120px">
+            <option value="">Все товарные группы</option>
+            {% for obj in products %}
+            <option value="{{ obj.1.0 }}" data-chained="{{ obj.0 }}">{{ obj.1.1 }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- 
+        <select id="mark" name="mark">
+            <option value="">--</option>
+            <option value="bmw">BMW</option>
+            <option value="audi">Audi</option>
+        </select>
+        <select id="series" name="series">
+            <option value="">--</option>
+            <option value="series-3" data-chained="bmw">3 series</option>
+            <option value="series-5" data-chained="bmw">5 series</option>
+            <option value="series-6" data-chained="bmw">6 series</option>
+            <option value="a3" data-chained="audi">A3</option>
+            <option value="a4" data-chained="audi">A4</option>
+            <option value="a5" data-chained="audi">A5</option>
+        </select> -->
+
+        <input type="submit" value="Фильтровать">
+    </form>
+
+
+    <div class="row">
+        <div class="container col-md-20">
+            <div class="row">
+                <ul class="list-group shadow">
+                    <table class="w-auto table-striped">
+                        <tr>
+                            <td> <b>Тип отношений</b> </td>
+                            <td> <b>Страны</b> </td>
+                            <td> <b>Коды СМТК</b> </td>
+                            <td class="w-50 p-3"> <b>Событие</b> </td>
+                            <td> <b>Источник</b> </td>
+                            <td> <b>Даты</b> </td>
+                            <td> <b>Вручную обработана</b> </td>
+                        </tr>
+                        {% for obj in mainpage_data %}
+                        <!-- <li class="list-group-item"> -->
+                        <tr>
+                            <td> {{ obj.classes }} </td>
+                            <td> {{ obj.locations }} </td>
+                            <td> {{ obj.itc_codes }} </td>
+                            <td class="w-50 p-3"> {{ obj.title }} </td>
+                            <td> <a href="{{ obj.url }}">
+                                    {{ obj.feed }}</a> </td>
+                            <td> {{ obj.dates }} </td>
+                            <td> {{ obj.manual }} </td>
+                        </tr>
+                        {% for d in obj.entities %}
+
+                        {% if d.ent__entity_class != "" %}
+                        <a class={{d.ent__entity_class}}>
+                            <ruby class={{d.ent__entity_class}}>{{ d.words }}
+                                <rp>
+                                    (</rp>
+                                <rt>
+                                    <span style="color: rgb(0, 0, 0);">
+                                        {{ d.ent__entity_class }}
+                                    </span>
+                                </rt>
+                                <rp>)
+
+                                </rp>
+                            </ruby>
+
+                        </a>
+
+                        {% else %}
+                        {{ d.words }}
+                        {% endif %}
+                        {% endfor %}
+                        <br>
+                        <!-- </li> -->
+                        {% endfor %}
+                    </table>
+                </ul>
+            </div>
+
+            <div class="pagination">
+                <span class="step-links">
+
+                    {% if page_has_previous %}
+                    <a href="{{ query }}&page=1">&laquo; Первая </a>
+                    <a href="{{ query }}&page={{ previous_page_number }}">Предыдущая</a>
+                    {% endif %}
+
+                    <span class="current">
+                        Страница {{ page_number }} из {{ num_pages }}.
+                    </span>
+
+                    {% if page_has_next %}
+                    <a href="{{ query }}&page={{ next_page_number }}">Следующая</a>
+                    <a href="{{ query }}&page={{ num_pages }}">Последняя &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+</div>
+
+<script>
+   <!-- $("#relation").chained("#region"); -->
+    $("#country").chained("#relation");
+    $("#product_branch").chained("#country");
+    $("#product").chained("#product_branch");
+
+</script>
+
+{% endblock main %}

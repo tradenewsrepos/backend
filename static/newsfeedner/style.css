@@ -1,0 +1,103 @@
+body {
+    padding-top: 60px;
+    line-height: 200%;
+}
+.DATE {
+    padding: .2em;
+    color: rgb(94, 92, 92);
+    /* border-bottom: 5px solid #474747; */
+}
+
+.FAC {
+    padding: .2em;
+    color: rgb(1, 3, 22);
+    border-bottom: 5px solid #474747;
+}
+
+
+.PRODUCT {
+    padding: .2em;
+    color: rgb(190, 15, 15);
+    border-bottom: 5px solid #da838a;
+}
+.CITY {
+    padding: .2em;
+    color: rgb(15, 111, 190);
+    /* border-bottom: 5px solid #231b99; */
+}
+
+.REGION {
+    padding: .2em;
+    color: rgb(45, 111, 190);
+    /* border-bottom: 5px solid #231b99; */
+}
+
+.COUNTRY {
+    padding: .2em;
+    color: rgb(15, 43, 78);
+    /* border-bottom: 5px solid #231b99; */
+}
+
+
+.GPE {
+    padding: .2em;
+    color: rgb(15, 151, 190);
+    /* border-bottom5: 5px solid #83acda; */
+}
+
+.EVENT {
+    padding: .2em;
+    color: rgb(187, 190, 15);
+    border-bottom: 5px solid #5b800c;
+}
+
+.PERSON {
+    padding: .2em;
+    color: black;
+    /* border-bottom: 5px solid #c3d37a; */
+}
+
+
+.per {
+    padding: .2em;
+    color: black;
+    /* border-bottom: 5px solid #c3d37a; */
+}
+
+.per:hover {
+    text-decoration-line: none;
+    background-color: #00109c;
+}
+
+.loc {
+    padding: .2em;
+    color: black;
+    border-bottom: 5px solid #FDEF8D;
+}
+
+.PRODUCT:hover {
+    text-decoration-line: none;
+    color: black;
+    background-color: rgb(190, 15, 15);
+    border-bottom: 5px solid #da838a;
+}
+
+.loc:hover {
+    text-decoration-line: none;
+    background-color: #FDEF8D;
+}
+
+.org {
+    padding: .2em;
+    color: black;
+    border-bottom: 5px solid #96D6F2;
+}
+
+.org:hover {
+    text-decoration-line: none;
+    background-color: #96D6F2;
+}
+
+.link-black {
+    color: black;
+}

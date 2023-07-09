@@ -1,0 +1,144 @@
+# Требует установки containers.podman
+
+- name: Под с контейнерами для сайта торговых новостей 
+  hosts: iori4
+  vars:
+    - repository: "http://containership:{{ containership_git_pass }}@10.8.0.4:3050/trade-news/trade_news_django.git"
+    - dest_folder: "/home/containership/trade_news_django"
+    - exterior_port: 10.8.0.1:9123
+    - env_file_path: "/home/containership/trade_news_django"
+    - env_file_source: ./.env
+    - nginx_conf_path: "/home/containership/trade_news_django/nginx.conf"
+
+  tasks:
+    - name: Remove trade_news_django folder
+      ansible.builtin.file:
+        dest: "{{ dest_folder }}"
+        state: absent
+
+    - name: Clone repo trade_news_django
+      ansible.builtin.git:
+        repo: "{{ repository }}"
+        dest: "{{ dest_folder }}"
+        accept_hostkey: yes
+        recursive: no
+        version: master
+      notify: rebuild and restart trade_news_django pod
+
+    - name: Copy .env file
+      ansible.builtin.copy:
+        src: "{{ env_file_source }}"
+        dest: "{{ env_file_path }}"
+        mode: 0600
+      notify: rebuild and restart trade_news_django pod
+
+  handlers:
+    - name: Stop and remove trade_news_django container
+      listen: rebuild and restart trade_news_django pod
+      containers.podman.podman_container:
+        name: trade_news_django
+        image: trade_news_django
+        state: absent
+      ignore_errors: yes
+
+    - name: Remove trade_news_django image
+      listen: rebuild and restart trade_news_django pod
+      containers.podman.podman_image:
+        name: trade_news_django
+        state: absent
+    
+    - name: Deletes trade_news_django pod
+      listen: rebuild and restart trade_news_django pod
+      containers.podman.podman_pod:
+        name: trade_news_django_pod
+        state: killed
+
+    - name: Create trade_news_django pod
+      listen: rebuild and restart trade_news_django pod
+      containers.podman.podman_pod:
+        name: trade_news_django_pod
+        state: started
+        publish:
+          - "{{ exterior_port }}:8080"
+    
+    - name: Build trade_news_django image
+      listen: rebuild and restart trade_news_django pod
+      containers.podman.podman_image:
+        name: trade_news_django
+        path: "{{ dest_folder }}"
+        build:
+          rm: yes
+  
+    - name: Start migrations
+      listen: rebuild and restart trade_news_django pod
+      containers.podman.podman_container:
+        name: trade_news_django
+        image: trade_news_django
+        pod: trade_news_django_pod
+        env_file: "{{ env_file_path }}"
+        command: "./manage.py migrate --noinput"
+        rm: yes
+        detach: no
+        volume:
+          - "trade_news_static:/code/static/"
+
+    - name: Start collectstatic
+      listen: rebuild and restart trade_news_django pod
+      containers.podman.podman_container:
+        name: trade_news_django
+        image: trade_news_django
+        pod: trade_news_django_pod
+        env_file: "{{ env_file_path }}"
+        command: "./manage.py collectstatic --noinput"
+        detach: no
+        rm: yes
+        volume:
+          - "trade_news_static:/code/static/"
+
+    - name: Load fixtures
+      listen: rebuild and restart trade_news_django pod
+      containers.podman.podman_container:
+        name: trade_news_django
+        image: trade_news_django
+        pod: trade_news_django_pod
+        env_file: "{{ env_file_path }}"
+        command: "./manage.py loaddata fixtures.json"
+        detach: no
+        rm: yes
+        volume:
+          - "trade_news_static:/code/static/"
+
+    # - name: Start createsuperuser
+    #   listen: rebuild and restart trade_news_django pod
+    #   containers.podman.podman_container:
+    #     name: trade_news_django
+    #     image: trade_news_django
+    #     pod: trade_news_django_pod
+    #     env_file: "{{ env_file_path }}"
+    #     command: "./manage.py createsuperuser --noinput"
+    #     detach: no
+    #     rm: yes
+    #     volume:
+    #       - "trade_news_static:/code/static/"
+    #       - "trade_news_media:/code/media/"
+
+    - name: Start trade_news_django container
+      listen: rebuild and restart trade_news_django pod
+      containers.podman.podman_container:
+        name: trade_news_django
+        image: trade_news_django
+        pod: trade_news_django_pod
+        env_file: "{{ env_file_path }}"
+        rm: yes
+        volume:
+          - "trade_news_static:/code/static/"
+
+    - name: Start nginx container
+      listen: rebuild and restart trade_news_django pod
+      containers.podman.podman_container:
+        name: trade_news_nginx
+        image: nginx:1.19.0-alpine
+        pod: trade_news_django_pod
+        volume:
+          - "trade_news_static:/code/static/"
+          - "{{ nginx_conf_path }}:/etc/nginx/conf.d/nginx.conf"
